@@ -3,17 +3,36 @@
     href="https://fonts.googleapis.com/css2?family=Volkhov&display=swap"
     rel="stylesheet"
   />
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css"
+    integrity="sha512-EZLkOqwILORob+p0BXZc+Vm3RgJBOe1Iq/0fiI7r/wJgzOFZMlsqTa29UEl6v6U6gsV4uIpsNZoV32YZqrCRCQ=="
+    crossorigin="anonymous"
+  />
   <title>Simple Card Editor</title>
   <style>
     body {
       font-family: "Volkhov", serif;
-      background-color: cornflowerblue;
+      background-color: rgb(13, 59, 80);
+      color: cornsilk;
+    }
+    @media print {
+      body {
+        background: none;
+      }
+    }
+    * {
+      box-sizing: border-box;
     }
     @media print {
       .no-print,
       .no-print * {
         display: none !important;
       }
+    }
+    /* UTILS */
+    .ml-8 {
+      margin-left: 8px;
     }
     /* HEADER  */
     .header {
@@ -24,13 +43,29 @@
     }
     .flex-line {
       display: flex;
+      align-items: baseline;
+    }
+    .header input {
+      margin-left: 8px;
+    }
+    .header button {
+      margin-left: 16px;
+      color: white;
     }
     /* PRINT */
     .a4-print {
+      margin-left: 2em;
+      margin-bottom: 2em;
       width: 29.2cm;
-      height: 20.5cm;
+      height: 20.3cm;
       border: 1px solid grey;
       background-color: white;
+    }
+    @media print {
+      .a4-print {
+        margin-left: 0;
+        margin-bottom: 0;
+      }
     }
     .flex-wrap {
       display: flex;
@@ -41,7 +76,77 @@
       border: 1px solid black;
       border-radius: 5px;
     }
+    @media print {
+      .card {
+        overflow: hidden;
+      }
+    }
+    .card textarea,
+    .card input {
+      background: none;
+      padding: 0;
+      border: none;
+      margin-bottom: 0.1em;
+      width: 98%;
+    }
+    .card textarea:hover,
+    .card input:hover {
+      background-color: crimson;
+    }
+    .card textarea:focus,
+    .card input:focus {
+      background-color: rgba(127, 127, 127, 0.3);
+    }
+    .c-header {
+      font-size: 1.3em;
+      font-weight: bold;
+    }
+    .c-subheader {
+      font-size: 1.1em;
+      font-weight: bold;
+    }
+    .img-wrap {
+      width: 98%;
+      position: relative;
+    }
+    .addImgBtn {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .addImgBtn > div {
+      cursor: pointer;
+      color: rgba(167, 167, 167, 0.8);
+      font-weight: bolder;
+    }
+    .c-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .c-text {
+      font-size: 1em;
+    }
+    .c-footer {
+      font-size: 0.8em;
+      font-style: italic;
+    }
+    /* Footer */
+    .footer {
+      margin: 2em;
+    }
   </style>
 </head>
-<main><body /></main>
+<main>
+  <body />
+  <div class="footer no-print">
+    Links
+    <a href="https://github.com/aronedwards91/Simple-Card-Prototyper">Github</a>
+  </div>
+</main>
 <script type="module" defer src="index.js"></script>

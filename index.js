@@ -5,15 +5,19 @@ function getIdVal(id) {
   return document.querySelector(`#${id}`).value;
 }
 const initCardData = {
-  height: 4.2,
-  width: 5.5,
+  height: 6.7,
+  width: 5.82,
+  padding: 5,
+  color: "#000000",
+  fontSize: 15,
+  imgHeight: 32,
 };
 // Adjusted for browser print margins in cm
 const A4Width = 29.2;
-const A4Height = 20.5;
+const A4Height = 20.3;
 function maxCardNum(h, w) {
-  const widthmax = Math.floor(A4Width / w);
   const heightMax = Math.floor(A4Height / h);
+  const widthmax = Math.floor(A4Width / w);
   return widthmax * heightMax;
 }
 
@@ -22,10 +26,11 @@ function App() {
   const [cardNum, setCardNum] = useState(
     maxCardNum(initCardData.height, initCardData.width)
   );
-  function onAdjustBasis(h, w) {
+  function onAdjustBasis(h, w, pad = 8) {
     setCardBasis({
       height: h,
       width: w,
+      pad: 8,
     });
     setCardNum(maxCardNum(h, w));
   }
@@ -45,7 +50,6 @@ function Header(props) {
   function adjustbasis() {
     const h = getIdVal(heightInputId);
     const w = getIdVal(widthInputId);
-    console.log("wh", h + "  - " + w);
     props.onAdjustBasis(h, w);
   }
 
@@ -62,7 +66,7 @@ function Header(props) {
         step="0.01"
         value=${cb.height}
       />
-      <div>width (cm):</div>
+      <div class="ml-8">width (cm):</div>
       <input
         type="number"
         id=${widthInputId}
@@ -72,7 +76,7 @@ function Header(props) {
         step="0.01"
         value=${cb.width}
       />
-      <button onClick=${adjustbasis}>Adjust</button>
+      <button class="ml-8" onClick=${adjustbasis}>Adjust</button>
     </div>
   </div> `;
 }
@@ -88,20 +92,51 @@ function Title() {
 function Print(props) {
   let CardArr = [];
   for (let i = 0; i < props.cardNum; i++) {
-    CardArr.push(html`<${Card} cardBasis=${props.cardBasis} />`);
+    CardArr.push(
+      html`<${Card}
+        cardBasis=${props.cardBasis}
+        id="card-body-${i}"
+        idVal="${i}"
+      />`
+    );
   }
   return html`
     <div class="a4-print"><div class="flex-wrap">${CardArr}</div></div>
   `;
 }
 function Card(props) {
-  console.log("props.cardBasis", props.cardBasis);
+  const [cardImg, setCardImg] = useState(null);
+  function thisFileUpload() {
+    document.getElementById(`file-${props.idVal}`).click();
+  }
+  function imgInputTrigger(e) {
+    var reader = new FileReader();
+    reader.onload = function (e) {
+        setCardImg(e.target.result);
+    }
+    reader.readAsDataURL(e.srcElement.files[0]);
+  }
   const cb = props.cardBasis;
   return html`<div
     class="card"
-    style="height:${cb.height}cm;width:${cb.width}cm;"
+    style="height:${cb.height}cm;width:${cb.width}cm;padding:${cb.padding}px;color:${cb.color};font-size:${cb.fontSize}px"
   >
-    <h4>Card header</h4>
+    <input class="c-header" value="Header" />
+    <input class="c-subheader" value="subheader" />
+    <div class="img-wrap" style="height:${cb.imgHeight}%">
+      <img class="c-image" alt="img" src="${cardImg}" />
+      <div class="addImgBtn">
+        <input
+          type="file"
+          id="file-${props.idVal}"
+          onchange=${imgInputTrigger}
+          style="display:none;"
+        />
+        <div onClick=${thisFileUpload}>[+]</div>
+      </div>
+    </div>
+    <textarea class="c-text" value="text" rows="2" />
+    <input class="c-footer" value="footer" />
   </div>`;
 }
 
