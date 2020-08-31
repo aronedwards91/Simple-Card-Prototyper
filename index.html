@@ -1,0 +1,47 @@
+<head>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Volkhov&display=swap"
+    rel="stylesheet"
+  />
+  <title>Simple Card Editor</title>
+  <style>
+    body {
+      font-family: "Volkhov", serif;
+      background-color: cornflowerblue;
+    }
+    @media print {
+      .no-print,
+      .no-print * {
+        display: none !important;
+      }
+    }
+    /* HEADER  */
+    .header {
+      padding: 2em;
+    }
+    .header h2 {
+      letter-spacing: 1px;
+    }
+    .flex-line {
+      display: flex;
+    }
+    /* PRINT */
+    .a4-print {
+      width: 29.2cm;
+      height: 20.5cm;
+      border: 1px solid grey;
+      background-color: white;
+    }
+    .flex-wrap {
+      display: flex;
+      flex-wrap: wrap;
+    }
+    /* CARD */
+    .card {
+      border: 1px solid black;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<main><body /></main>
+<script type="module" defer src="index.js"></script>
