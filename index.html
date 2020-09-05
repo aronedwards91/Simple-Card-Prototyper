@@ -14,7 +14,7 @@
     body {
       font-family: "Volkhov", serif;
       background-color: rgb(13, 59, 80);
-      background: url('tess-parch-1.png');
+      background: url("tess-parch-1.png");
       color: cornsilk;
     }
     @media print {
@@ -37,7 +37,7 @@
     }
     /* HEADER  */
     .header {
-      padding: 2em;
+      padding: 1em 0 0em 2em;
     }
     .header h2 {
       letter-spacing: 1px;
@@ -52,7 +52,7 @@
     .header button {
       margin-left: 16px;
       color: white;
-      background-color: cornflowerblue;
+      background-color: rgb(95, 38, 12);
     }
     /* PRINT */
     .a4-print {
@@ -91,6 +91,7 @@
       margin-bottom: 0.1em;
       width: 98%;
       color: inherit;
+      font-family: inherit;
     }
     .card textarea:hover,
     .card input:hover {
@@ -143,6 +144,9 @@
     .footer {
       margin: 2em;
     }
+    .footer a {
+      color: rgb(32, 130, 196);
+    }
     /* loading Spinner */
     .spinner {
       margin: 100px auto;
@@ -153,7 +157,7 @@
     }
 
     .spinner > div {
-      background-color: rgb(60, 236, 192);
+      background-color: rgb(75, 41, 14);
       height: 100%;
       width: 12px;
       display: inline-block;
@@ -209,6 +213,16 @@
 </head>
 <main>
   <body>
+    <div class="no-print header">
+      <div>
+        <h2>Welcome to The Simple Online Card Editor</h2>
+        <h4>A basic tool for quickly creating card prototypes</h4>
+        <p>
+          Edit any text by clicking in the text boxes, to add an image click in
+          the center of the image box & make any global changes below
+        </p>
+      </div>
+    </div>
     <div class="spinner" id="loading-spinner">
       <div class="rect1"></div>
       <div class="rect2"></div>
@@ -216,6 +230,7 @@
       <div class="rect4"></div>
       <div class="rect5"></div>
     </div>
+    <div id="preact-app"></div>
   </body>
   <div class="footer no-print">
     Links
