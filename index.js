@@ -9,6 +9,14 @@ styleNode.type = "text/css";
 document.getElementsByTagName("head")[0].appendChild(styleNode);
 updateFont(`"Volkhov", serif`);
 
+const CardDefault = {
+  header: "header",
+  subheader: "Subheader",
+  img: "",
+  text: "card text",
+  footer: "footer",
+};
+
 function updateFont(fontName) {
   if (!!(window.attachEvent && !window.opera)) {
     styleNode.styleSheet.cssText = `.a4-print { font-family: ${fontName}; }`;
@@ -48,6 +56,11 @@ function App() {
   const [cardNum, setCardNum] = useState(
     maxCardNum(initCardData.height, initCardData.width)
   );
+  const [cardData, setCardData] = useState(Array(cardNum).fill(CardDefault));
+
+  function buildCards(newNum) {
+    setCardData(Array(newNum).fill(CardDefault));
+  }
 
   useEffect(() => {
     document.querySelector("#loading-spinner").remove();
@@ -57,20 +70,22 @@ function App() {
     setIsAdjusted(true);
   }
 
-  function onAdjustBasis(h, w, padding, color, fontSize, imgHeight, fontName) {
-    setCardBasis({
-      height: h,
-      width: w,
-      padding,
-      color,
-      fontSize,
-      imgHeight,
-      fontName,
-    });
-    setCardNum(maxCardNum(h, w));
-    updateFont(fontName);
+  function updateSettings(data) {
+    setCardBasis(data);
+    updateFont(data.fontName);
     setIsAdjusted(false);
   }
+  function onAdjustBasis(data) {
+    setCardNum(maxCardNum(data.height, data.width));
+    updateSettings(data);
+  }
+  function onBuildAll(data) {
+    const newNum = maxCardNum(data.height, data.width);
+    setCardNum(newNum);
+    buildCards(newNum);
+    updateSettings(data);
+  }
+
   function customFontAdd(url, name) {
     var linkNode = document.createElement("link");
     linkNode.rel = "stylesheet";
@@ -78,14 +93,52 @@ function App() {
     document.getElementsByTagName("head")[0].appendChild(linkNode);
     updateFont(name);
   }
+
+  function onImportJSON(e) {
+    e.preventDefault();
+    const fileInput = document.getElementById(importJSONID);
+
+    var reader = new FileReader();
+
+    reader.onload = function (e) {
+      const jsonData = JSON.parse(e.target.result);
+
+      if (jsonData.settings) {
+        onAdjustBasis(jsonData.settings);
+      }
+
+      const newNum = maxCardNum(
+        jsonData.settings.height,
+        jsonData.settings.width
+      );
+      if (jsonData.cards.length > newNum) {
+        setCardData(jsonData.cards.slice(0, newNum));
+      } else if (jsonData.cards.length < newNum) {
+        setCardData(
+          jsonData.cards.concat(
+            Array(newNum - jsonData.cards.length).fill(CardDefault)
+          )
+        );
+      }
+    };
+
+    if (fileInput.files[0]) reader.readAsText(fileInput.files[0]);
+  }
+
   return html`<div>
     <${Header}
       cardBasis=${cardBasis}
-      onAdjustBasis=${onAdjustBasis}
+      onBuildAll=${onBuildAll}
       customFontAdd=${customFontAdd}
       isAdjusted=${isAdjusted}
       setAdjTrue=${setAdjTrue}
-    /><${Print} cardBasis=${cardBasis} cardNum=${cardNum} />
+      cardData=${cardData}
+      onImportJSON=${onImportJSON}
+    /><${Print}
+      cardBasis=${cardBasis}
+      cardNum=${cardNum}
+      cardData=${cardData}
+    />
   </div>`;
 }
 
@@ -99,23 +152,38 @@ const fontNameInputId = "cfontname";
 
 const customFontURL = "customfURLId";
 const customFontName = "customfNameId";
+const importJSONID = "cimportJSON";
 
 function Header(props) {
   const cb = props.cardBasis;
-  function adjustbasis() {
-    const h = getIdVal(heightInputId);
-    const w = getIdVal(widthInputId);
-    const p = getIdVal(paddingInputId);
-    const col = getIdVal(colorInputId);
-    const fs = getIdVal(fontInputId);
-    const is = getIdVal(imgsizeInputId);
-    const font = getIdVal(fontNameInputId);
-    props.onAdjustBasis(h, w, p, col, fs, is, font);
+  function getFormData() {
+    return {
+      height: getIdVal(heightInputId),
+      width: getIdVal(widthInputId),
+      padding: getIdVal(paddingInputId),
+      color: getIdVal(colorInputId),
+      fontSize: getIdVal(fontInputId),
+      imgHeight: getIdVal(imgsizeInputId),
+      fontName: getIdVal(fontNameInputId),
+    };
+  }
+  function adjustSettings() {
+    props.onBuildAll(getFormData());
   }
   function customFontAdd() {
     const url = getIdVal(customFontName);
     const name = getIdVal(customFontURL);
     props.customFontAdd(url, name);
+  }
+  function exportJSON() {
+    const jsonString = JSON.stringify({
+      settings: getFormData(),
+      cards: props.cardData,
+    });
+    var file = new Blob([jsonString], {
+      type: "application/json;charset=utf-8",
+    });
+    saveAs(file, "card-data.json");
   }
 
   return html`<div class="header no-print">
@@ -240,7 +308,11 @@ function Header(props) {
       </div>
     </div>
     <div class="flex-line">
-      <button class="ml-8" onClick=${adjustbasis} disabled=${!props.isAdjusted}>
+      <button
+        class="ml-8"
+        onClick=${adjustSettings}
+        disabled=${!props.isAdjusted}
+      >
         Adjust
       </button>
     </div>
@@ -256,22 +328,36 @@ function Header(props) {
       <input type="text" id=${customFontURL} />
       <button class="ml-8" onClick=${customFontAdd}>Add Custom Font</button>
     </div>
+    <div class="flex-line">
+      <form
+        enctype="multipart/form-data"
+        class="flex-line"
+        onSubmit=${(e) => props.onImportJSON(e)}
+      >
+        <input id=${importJSONID} type="file" />
+        <label for=${importJSONID}>Import JSON</label>
+        <input type="submit" value="Upload" on />
+      </form>
+
+      <button onClick=${exportJSON}>Export Card Data</button>
+    </div>
   </div>`;
 }
 
-function Print(props) {
-  let CardArr = [];
-  for (let i = 0; i < props.cardNum; i++) {
-    CardArr.push(
-      html`<${Card}
-        cardBasis=${props.cardBasis}
-        id="card-body-${i}"
-        idVal="${i}"
-      />`
-    );
-  }
+function Print({ cardBasis, cardData }) {
   return html`
-    <div class="a4-print"><div class="flex-wrap">${CardArr}</div></div>
+    <div class="a4-print">
+      <div class="flex-wrap">
+        ${cardData.map(
+          (data, i) => html`<${Card}
+            cardBasis=${cardBasis}
+            cardData=${data}
+            id="card-body-${i}"
+            idVal="${i}"
+          />`
+        )}
+      </div>
+    </div>
   `;
 }
 function Card(props) {
@@ -291,10 +377,10 @@ function Card(props) {
     class="card"
     style="height:${cb.height}cm;width:${cb.width}cm;padding:${cb.padding}cm;color:${cb.color};font-size:${cb.fontSize}px"
   >
-    <input class="c-header" value="Header" />
-    <input class="c-subheader" value="subheader" />
+    <input class="c-header" defaultValue="${props.cardData.header}" />
+    <input class="c-subheader" defaultValue="${props.cardData.subheader}" />
     <div class="img-wrap" style="height:${cb.imgHeight}%">
-      <img class="c-image" alt="img" src="${cardImg}" />
+      <img class="c-image" alt="img" src="${cardImg || props.cardData.img}" />
       <div class="addImgBtn no-print">
         <input
           type="file"
@@ -305,8 +391,8 @@ function Card(props) {
         <div onClick=${thisFileUpload}>[+]</div>
       </div>
     </div>
-    <textarea class="c-text" value="text" rows="2" />
-    <input class="c-footer" value="footer" />
+    <textarea class="c-text" defaultValue="${props.cardData.text}" rows="2" />
+    <input class="c-footer" defaultValue="${props.cardData.footer}" />
   </div>`;
 }
 
