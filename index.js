@@ -42,13 +42,20 @@ function maxCardNum(h, w) {
 }
 
 function App() {
+  const [isAdjusted, setIsAdjusted] = useState(false);
   const [cardBasis, setCardBasis] = useState(initCardData);
   const [cardNum, setCardNum] = useState(
     maxCardNum(initCardData.height, initCardData.width)
   );
+
   useEffect(() => {
     document.querySelector("#loading-spinner").remove();
   }, []);
+
+  function setAdjTrue() {
+    setIsAdjusted(true);
+  }
+
   function onAdjustBasis(h, w, padding, color, fontSize, imgHeight, fontName) {
     setCardBasis({
       height: h,
@@ -61,6 +68,7 @@ function App() {
     });
     setCardNum(maxCardNum(h, w));
     updateFont(fontName);
+    setIsAdjusted(false);
   }
   function customFontAdd(url, name) {
     var linkNode = document.createElement("link");
@@ -74,6 +82,8 @@ function App() {
       cardBasis=${cardBasis}
       onAdjustBasis=${onAdjustBasis}
       customFontAdd=${customFontAdd}
+      isAdjusted=${isAdjusted}
+      setAdjTrue=${setAdjTrue}
     /><${Print} cardBasis=${cardBasis} cardNum=${cardNum} />
   </div>`;
 }
@@ -108,102 +118,115 @@ function Header(props) {
   }
 
   return html`<div class="header">
-    <div class="flex-line">
-      <div>Card Setup | Height (cm) :</div>
-      <input
-        type="number"
-        id=${heightInputId}
-        name="height"
-        min="1"
-        max="10"
-        step="0.01"
-        value=${cb.height}
-      />
-      <div class="ml-8">width (cm):</div>
-      <input
-        type="number"
-        id=${widthInputId}
-        name="height"
-        min="1"
-        max="10"
-        step="0.01"
-        value=${cb.width}
-      />
+    <div class="flex-line" style="flex-wrap: wrap; gap: 1rem">
+      <div class="flex-line">
+        <div>Card Setup | Height (cm) :</div>
+        <input
+          onchange=${props.setAdjTrue}
+          type="number"
+          id=${heightInputId}
+          name="height"
+          min="1"
+          max="10"
+          step="0.01"
+          value=${cb.height}
+        />
+      </div>
+      <div class="flex-line">
+        <div>width (cm):</div>
+        <input
+          type="number"
+          id=${widthInputId}
+          name="height"
+          min="1"
+          max="10"
+          step="0.01"
+          value=${cb.width}
+        />
+      </div>
+      <div class="flex-line">
+        <div>Padding (cm):</div>
+        <input
+          type="number"
+          id=${paddingInputId}
+          name="padding"
+          min="0"
+          max="10"
+          step="0.01"
+          value=${cb.padding}
+        />
+      </div>
+      <div class="flex-line">
+        <div>Text Color:</div>
+        <input type="color" id=${colorInputId} name="color" value=${cb.color} />
+      </div>
+      <div class="flex-line">
+        <div>Font Size (px):</div>
+        <input
+          type="number"
+          id=${fontInputId}
+          name="font size"
+          min="1"
+          max="40"
+          step="0.01"
+          value=${cb.fontSize}
+        />
+      </div>
+      <div class="flex-line">
+        <div class="ml-8">Image Height (% of Card):</div>
+        <input
+          type="number"
+          id=${imgsizeInputId}
+          name="Image Height"
+          min="1"
+          max="90"
+          step="0.1"
+          value=${cb.imgHeight}
+        />
+      </div>
+      <div class="flex-line">
+        <div>Font:</div>
+        <select class="ml-8" name="Fonts" id=${fontNameInputId}>
+          <option style="font-family:'Volkhov'" value="${`"Volkhov", serif`}">
+            Volkhov
+          </option>
+          <option
+            style="font-family:'Arial'"
+            value="“Arial”, Helvetica, sans-serif"
+          >
+            Arial
+          </option>
+          <option style="font-family:'Verdana'" value="Verdana, sans-serif">
+            Verdana
+          </option>
+          <option
+            style="font-family:'Trebuchet MS'"
+            value="'Trebuchet MS', sans-serif"
+          >
+            Trebuchet MS
+          </option>
+          <option style="font-family:'Didot'" value="'Didot', sans-serif">
+            Didot
+          </option>
+          <option
+            style="font-family:'American Typewriter'"
+            value="'American Typewriter', sans-serif"
+          >
+            American Typewriter
+          </option>
+          <option style="font-family:Courier'" value="'Courier', sans-serif">
+            Courier
+          </option>
+          <option style="font-family:Luminari'" value="'Luminari', sans-serif">
+            Luminari
+          </option>
+        </select>
+      </div>
     </div>
     <div class="flex-line">
-      <div>Padding (cm):</div>
-      <input
-        type="number"
-        id=${paddingInputId}
-        name="padding"
-        min="0"
-        max="10"
-        step="0.01"
-        value=${cb.padding}
-      />
-      <div class="ml-8">Color:</div>
-      <input type="color" id=${colorInputId} name="color" value=${cb.color} />
-    </div>
-    <div class="flex-line">
-      <div>Font Size (px):</div>
-      <input
-        type="number"
-        id=${fontInputId}
-        name="font size"
-        min="1"
-        max="40"
-        step="0.01"
-        value=${cb.fontSize}
-      />
-      <div class="ml-8">Image Height (% of Card):</div>
-      <input
-        type="number"
-        id=${imgsizeInputId}
-        name="Image Height"
-        min="1"
-        max="90"
-        step="0.1"
-        value=${cb.imgHeight}
-      />
-    </div>
-    <div class="flex-line">
-      <div>Font:</div>
-      <select class="ml-8" name="Fonts" id=${fontNameInputId}>
-        <option style="font-family:'Volkhov'" value="${`"Volkhov", serif`}">
-          Volkhov
-        </option>
-        <option
-          style="font-family:'Arial'"
-          value="“Arial”, Helvetica, sans-serif"
-        >
-          Arial
-        </option>
-        <option style="font-family:'Verdana'" value="Verdana, sans-serif">
-          Verdana
-        </option>
-        <option
-          style="font-family:'Trebuchet MS'"
-          value="'Trebuchet MS', sans-serif"
-        >
-          Trebuchet MS
-        </option>
-        <option style="font-family:'Didot'" value="'Didot', sans-serif">
-          Didot
-        </option>
-        <option
-          style="font-family:'American Typewriter'"
-          value="'American Typewriter', sans-serif"
-        >
-          American Typewriter
-        </option>
-        <option style="font-family:Courier'" value="'Courier', sans-serif">
-          Courier
-        </option>
-        <option style="font-family:Luminari'" value="'Luminari', sans-serif">
-          Luminari
-        </option>
-      </select>
-      <button class="ml-8" onClick=${adjustbasis}>Adjust</button>
+      <button class="ml-8" onClick=${adjustbasis} disabled=${!props.isAdjusted}>
+        Adjust
+      </button>
     </div>
     <p>
       To add a custom font you need the link & the font's name, google fonts is
