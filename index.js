@@ -50,6 +50,15 @@ function maxCardNum(h, w) {
   return widthmax * heightMax;
 }
 
+function checkIsValidUrl(string) {
+  try {
+    new URL(string);
+    return true;
+  } catch (err) {
+    return false;
+  }
+}
+
 function App() {
   const [isAdjusted, setIsAdjusted] = useState(false);
   const [cardBasis, setCardBasis] = useState(initCardData);
@@ -62,8 +71,42 @@ function App() {
     setCardData(Array(newNum).fill(CardDefault));
   }
 
+  function applyJSON(jsonData) {
+    if (jsonData.settings) {
+      onAdjustBasis(jsonData.settings);
+    }
+
+    const newNum = maxCardNum(
+      jsonData.settings.height,
+      jsonData.settings.width
+    );
+    if (jsonData.cards.length > newNum) {
+      setCardData(jsonData.cards.slice(0, newNum));
+    } else if (jsonData.cards.length < newNum) {
+      setCardData(
+        jsonData.cards.concat(
+          Array(newNum - jsonData.cards.length).fill(CardDefault)
+        )
+      );
+    }
+  }
+
   useEffect(() => {
     document.querySelector("#loading-spinner").remove();
+
+    if (location.search && location.search.length > 1) {
+      const URLParams = new URLSearchParams(location.search);
+      const url = URLParams.get("json");
+      const isValidUrl = checkIsValidUrl(url);
+
+      if (isValidUrl) {
+        fetch(url).then((data) => {
+          data.json().then((json) => {
+            applyJSON(json)
+          });
+        });
+      }
+    }
   }, []);
 
   function setAdjTrue() {
@@ -103,23 +146,7 @@ function App() {
     reader.onload = function (e) {
       const jsonData = JSON.parse(e.target.result);
 
-      if (jsonData.settings) {
-        onAdjustBasis(jsonData.settings);
-      }
-
-      const newNum = maxCardNum(
-        jsonData.settings.height,
-        jsonData.settings.width
-      );
-      if (jsonData.cards.length > newNum) {
-        setCardData(jsonData.cards.slice(0, newNum));
-      } else if (jsonData.cards.length < newNum) {
-        setCardData(
-          jsonData.cards.concat(
-            Array(newNum - jsonData.cards.length).fill(CardDefault)
-          )
-        );
-      }
+      applyJSON(jsonData);
     };
 
     if (fileInput.files[0]) reader.readAsText(fileInput.files[0]);
