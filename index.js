@@ -24,8 +24,8 @@ function getIdVal(id) {
   return document.querySelector(`#${id}`).value;
 }
 const initCardData = {
-  height: 6.7,
-  width: 5.82,
+  height: 6.5,
+  width: 5.8,
   padding: 0.12,
   color: "#000000",
   fontSize: 15,
@@ -33,8 +33,9 @@ const initCardData = {
   fontName: `"Volkhov", serif`,
 };
 // Adjusted for browser print margins in cm
-const A4Width = 29.2;
-const A4Height = 20.3;
+const A4Width = 29.1;
+const A4Height = 19.6;
+
 function maxCardNum(h, w) {
   const heightMax = Math.floor(A4Height / h);
   const widthmax = Math.floor(A4Width / w);
@@ -117,7 +118,7 @@ function Header(props) {
     props.customFontAdd(url, name);
   }
 
-  return html`<div class="header">
+  return html`<div class="header no-print">
     <div class="flex-line" style="flex-wrap: wrap; gap: 1rem">
       <div class="flex-line">
         <div>Card Setup | Height (cm) :</div>
@@ -135,6 +136,7 @@ function Header(props) {
       <div class="flex-line">
         <div>width (cm):</div>
         <input
+          onchange=${props.setAdjTrue}
           type="number"
           id=${widthInputId}
           name="height"
@@ -147,6 +149,7 @@ function Header(props) {
       <div class="flex-line">
         <div>Padding (cm):</div>
         <input
+          onchange=${props.setAdjTrue}
           type="number"
           id=${paddingInputId}
           name="padding"
@@ -158,11 +161,18 @@ function Header(props) {
       </div>
       <div class="flex-line">
         <div>Text Color:</div>
-        <input type="color" id=${colorInputId} name="color" value=${cb.color} />
+        <input
+          type="color"
+          onchange=${props.setAdjTrue}
+          id=${colorInputId}
+          name="color"
+          value=${cb.color}
+        />
       </div>
       <div class="flex-line">
         <div>Font Size (px):</div>
         <input
+          onchange=${props.setAdjTrue}
           type="number"
           id=${fontInputId}
           name="font size"
@@ -175,6 +185,7 @@ function Header(props) {
       <div class="flex-line">
         <div class="ml-8">Image Height (% of Card):</div>
         <input
+          onchange=${props.setAdjTrue}
           type="number"
           id=${imgsizeInputId}
           name="Image Height"
@@ -186,7 +197,12 @@ function Header(props) {
       </div>
       <div class="flex-line">
         <div>Font:</div>
-        <select class="ml-8" name="Fonts" id=${fontNameInputId}>
+        <select
+          class="ml-8"
+          name="Fonts"
+          id=${fontNameInputId}
+          onchange=${props.setAdjTrue}
+        >
           <option style="font-family:'Volkhov'" value="${`"Volkhov", serif`}">
             Volkhov
           </option>
