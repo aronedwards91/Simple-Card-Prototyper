@@ -1,0 +1,27 @@
+{
+  "settings": {
+    "height": "8",
+    "width": "7",
+    "padding": "0.08",
+    "color": "#9c3a3a",
+    "fontSize": "12",
+    "imgHeight": "28",
+    "fontName": "\"Arial\", serif"
+  },
+  "cards": [
+    {
+      "header": "header1",
+      "subheader": "Subheader1",
+      "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/92/Bangladeshi_Dog.jpg/330px-Bangladeshi_Dog.jpg",
+      "text": "a dog",
+      "footer": "woof"
+    },
+    {
+      "header": "header2",
+      "subheader": "Subheader2",
+      "img": "",
+      "text": "more text",
+      "footer": "test footer"
+    }
+  ]
+}
