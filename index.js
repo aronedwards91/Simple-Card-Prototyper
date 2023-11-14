@@ -1,8 +1,6 @@
-import { html, render } from "https://unpkg.com/htm/preact/index.mjs?module";
-import {
-  useState,
-  useEffect,
-} from "https://unpkg.com/preact@latest/hooks/dist/hooks.module.js?module";
+  import { render } from 'preact';
+  import { useState, useEffect, } from 'preact/hooks';
+  import { html } from 'htm/preact';
 
 var styleNode = document.createElement("style");
 styleNode.type = "text/css";
